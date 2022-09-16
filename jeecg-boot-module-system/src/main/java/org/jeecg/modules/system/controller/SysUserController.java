@@ -1,7 +1,11 @@
 package org.jeecg.modules.system.controller;
 
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.ContentType;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -24,6 +28,8 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.*;
+import org.jeecg.modules.check.dto.MesUserInfoResponse;
+import org.jeecg.modules.check.service.mes.MesUserService;
 import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
@@ -126,7 +132,9 @@ public class SysUserController {
 		result.setSuccess(true);
 		result.setResult(pageList);
 		log.info(pageList.toString());
-		return result;
+        /*String userCookie = getUserCookie();
+        MesUserInfoResponse userInfoByCode = getUserInfoByCode("00300001");*/
+        return result;
 	}
 
     //@RequiresRoles({"admin"})
@@ -1359,6 +1367,30 @@ public class SysUserController {
         user.setPhone(phone);
         sysUserService.updateById(user);
         return Result.ok("手机号设置成功!");
+    }
+
+    public MesUserInfoResponse getUserInfoByCode(String code) {
+        // TODO:  查询用户信息
+        Map<String, Object> params = new HashMap<>();
+        params.put("strUserCode", code);
+        //params.put("strUserName", code);
+        HttpResponse response = HttpRequest.get("http://172.16.10.2:5000/TSetting/QueryUserByUserCode")
+                .form(params)
+                .header("Cookie", getUserCookie())
+                .execute();
+        String cookieStr = response.getCookieStr();
+
+        return JSON.parseObject(response.body(), MesUserInfoResponse.class);
+    }
+
+    public String getUserCookie() {
+        Map<String, Object> param = new HashMap<>();
+        param.put("username", "admin");
+        param.put("password", "maple");
+        HttpResponse response = HttpRequest.post("http://172.16.10.2:5000/Account/MESCheckLogin")
+                .contentType(ContentType.FORM_URLENCODED.getValue())
+                .form(param).execute();
+        return response == null ? null : response.getCookieStr();
     }
 
     
