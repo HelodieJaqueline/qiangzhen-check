@@ -6,12 +6,14 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.jeecg.modules.check.dto.MesWorkStateResponse;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Author: zhangrui
@@ -23,7 +25,7 @@ import java.util.HashMap;
 public class MesWorkService {
 
 
-    public MesWorkStateResponse queryInfo(String workCode) {
+    public MesWorkStateResponse.WorkState queryInfo(String workCode) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.minusDays(180);
         LocalDateTime endOfToday = DateUtil.toLocalDateTime(DateUtil.endOfDay(new Date()));
@@ -37,7 +39,16 @@ public class MesWorkService {
                 .contentType(ContentType.FORM_URLENCODED.getValue()).form(map).execute();
         String body = response.body();
         log.info("接口返回:{}", body);
-        return JSON.parseObject(body, MesWorkStateResponse.class);
+        MesWorkStateResponse mesWorkStateResponse = JSON.parseObject(body, MesWorkStateResponse.class);
+        List<MesWorkStateResponse.WorkState> workStates = mesWorkStateResponse.getWorkStates();
+        return CollectionUtils.isEmpty(workStates) ? null : workStates.get(0);
+    }
+
+    public MesWorkStateResponse.WorkState queryInfo(){
+        MesWorkStateResponse.WorkState workState = new MesWorkStateResponse.WorkState();
+        workState.setMaterialName("测试物料号");
+        workState.setProductDraw("10.11.2.3");
+        return workState;
     }
 
 }
