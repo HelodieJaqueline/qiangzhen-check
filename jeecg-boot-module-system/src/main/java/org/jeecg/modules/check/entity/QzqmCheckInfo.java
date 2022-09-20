@@ -100,6 +100,7 @@ public class QzqmCheckInfo implements Serializable {
 	/**检验设备*/
 	@Excel(name = "检验设备", width = 15)
     @ApiModelProperty(value = "检验设备")
+    @Dict(dicCode = "checkDevice")
     private Integer checkDevice;
 	/**检测时间*/
 	@Excel(name = "检测时间", width = 15, format = "yyyy-MM-dd")
@@ -124,10 +125,12 @@ public class QzqmCheckInfo implements Serializable {
 	/**检测状态(0:待检测，1:检测中，2:检测完成)*/
 	@Excel(name = "检测状态(0:待检测，1:检测中，2:检测完成)", width = 15)
     @ApiModelProperty(value = "检测状态(0:待检测，1:检测中，2:检测完成)")
+    @Dict(dicCode = "checkStatus")
     private Integer checkStatus;
 	/**合格状态(0:未知，1:合格，2:不合格)*/
 	@Excel(name = "合格状态(0:未知，1:合格，2:不合格)", width = 15)
     @ApiModelProperty(value = "合格状态(0:未知，1:合格，2:不合格)")
+    @Dict(dicCode = "qualifiedStatus")
     private Integer qualifiedStatus;
 	/**是否已删除*/
 	@Excel(name = "是否已删除", width = 15)

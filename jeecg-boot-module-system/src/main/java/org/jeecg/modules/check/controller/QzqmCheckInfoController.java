@@ -12,9 +12,11 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.modules.check.dto.MesUserInfoResponse;
 import org.jeecg.modules.check.dto.MesWorkStateResponse;
 import org.jeecg.modules.check.entity.QzqmCheckInfo;
 import org.jeecg.modules.check.service.IQzqmCheckInfoService;
+import org.jeecg.modules.check.service.mes.MesUserService;
 import org.jeecg.modules.check.service.mes.MesWorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +51,9 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 
 	@Autowired
 	private MesWorkService mesWorkService;
+
+	@Autowired
+	private MesUserService mesUserService;
 	
 	/**
 	 * 分页列表查询
@@ -180,12 +185,12 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	 @GetMapping(value = "/queryWorkState")
 	 public Result<?> queryWorkState(QzqmCheckInfo qzqmCheckInfo,
 									HttpServletRequest req) {
-		 MesWorkStateResponse.WorkState workState = mesWorkService.queryInfo();
+		 MesWorkStateResponse.WorkState workState = mesWorkService.queryInfo(qzqmCheckInfo.getWorkCode());
 		 return Result.OK(workState);
 	 }
 
 	 /**
-	  * 分页列表查询
+	  * 查询mes工单
 	  *
 	  * @return
 	  */
@@ -200,5 +205,19 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		 }
 		 return Result.OK(list.get(0));
 	 }
+
+	/**
+	 * 查询mes员工
+	 *
+	 * @param userId
+	 * @return
+	 */
+	@AutoLog(value = "qzqm_check_info-查询员工")
+	@ApiOperation(value="qzqm_check_info-查询员工", notes="qzqm_check_info-查询员工")
+	@GetMapping(value = "/queryMesUser")
+	public Result<?> queryMesUser(String userId) {
+		MesUserInfoResponse.MesUser mesUser = mesUserService.getUserInfoByCode(userId);
+		return Result.OK(mesUser);
+	}
 
 }
