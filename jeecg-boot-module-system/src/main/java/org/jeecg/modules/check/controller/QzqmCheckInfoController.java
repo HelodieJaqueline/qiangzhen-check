@@ -12,12 +12,15 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.modules.check.dto.FailureRateDTO;
 import org.jeecg.modules.check.dto.MesUserInfoResponse;
 import org.jeecg.modules.check.dto.MesWorkStateResponse;
+import org.jeecg.modules.check.dto.PassRateDTO;
 import org.jeecg.modules.check.entity.QzqmCheckInfo;
 import org.jeecg.modules.check.service.IQzqmCheckInfoService;
 import org.jeecg.modules.check.service.mes.MesUserService;
 import org.jeecg.modules.check.service.mes.MesWorkService;
+import org.jeecg.modules.check.vo.SummaryVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -218,6 +221,41 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	public Result<?> queryMesUser(String userId) {
 		MesUserInfoResponse.MesUser mesUser = mesUserService.getUserInfoByCode(userId);
 		return Result.OK(mesUser);
+	}
+
+	@AutoLog(value = "qzqm_check_info-轮播表")
+	@ApiOperation(value="qzqm_check_info-轮播表", notes="qzqm_check_info-轮播表")
+	@GetMapping(value = "/tableScroll")
+	public List<QzqmCheckInfo> tableScroll(QzqmCheckInfo qzqmCheckInfo,
+								   @RequestParam(name="pageNo", defaultValue="1",required = false) Integer pageNo,
+								   @RequestParam(name="pageSize", defaultValue="10",required = false) Integer pageSize,
+								   HttpServletRequest req) {
+		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
+		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
+		return pageList.getRecords();
+	}
+
+	@AutoLog(value = "qzqm_check_info-数据总览")
+	@ApiOperation(value = "qzqm_check_info-数据总览", notes = "qzqm_check_info-数据总览")
+	@GetMapping(value = "/summary")
+	public List<SummaryVO> summary(@RequestParam(required = false, defaultValue = "1") Integer type) {
+		return qzqmCheckInfoService.summary(type);
+	}
+
+	@AutoLog(value = "qzqm_check_info-合格率排行榜")
+	@ApiOperation(value = "qzqm_check_info-合格率排行榜", notes = "qzqm_check_info-合格率排行榜")
+	@GetMapping(value = "/passRate")
+	public List<PassRateDTO> passRate() {
+		return qzqmCheckInfoService.passRate();
+	}
+
+	@AutoLog(value = "qzqm_check_info-零件故障率")
+	@ApiOperation(value = "qzqm_check_info-零件故障率", notes = "qzqm_check_info-零件故障率")
+	@GetMapping(value = "/failureRate")
+	public List<FailureRateDTO> failureRate(@RequestParam(required = false, defaultValue = "1") Integer type,
+											String productDraw) {
+		return qzqmCheckInfoService.failureRate(type, productDraw);
 	}
 
 }

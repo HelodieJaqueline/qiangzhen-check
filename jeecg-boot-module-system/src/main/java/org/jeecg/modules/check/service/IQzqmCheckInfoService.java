@@ -1,7 +1,12 @@
 package org.jeecg.modules.check.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.check.dto.FailureRateDTO;
+import org.jeecg.modules.check.dto.PassRateDTO;
 import org.jeecg.modules.check.entity.QzqmCheckInfo;
+import org.jeecg.modules.check.vo.SummaryVO;
+
+import java.util.List;
 
 /**
  * @Description: qzqm_check_info
@@ -11,4 +16,9 @@ import org.jeecg.modules.check.entity.QzqmCheckInfo;
  */
 public interface IQzqmCheckInfoService extends IService<QzqmCheckInfo> {
 
+    List<SummaryVO> summary(Integer type);
+
+    List<PassRateDTO> passRate();
+
+    List<FailureRateDTO> failureRate(Integer type, String productDraw);
 }

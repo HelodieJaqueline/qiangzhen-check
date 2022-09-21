@@ -122,6 +122,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/**/*.css.map", "anon");
         //大屏设计器排除
         filterChainDefinitionMap.put("/bigscreen/**", "anon");
+        filterChainDefinitionMap.put("/check/qzqmCheckInfo/**", "anon");
+
 
         //测试示例
         filterChainDefinitionMap.put("/test/bigScreen/**", "anon"); //大屏模板例子

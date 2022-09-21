@@ -2,4 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.check.mapper.QzqmCheckInfoMapper">
 
+    <select id="countByCheckStatus" resultType="org.jeecg.modules.check.dto.CountDTO">
+        select check_status as type,COUNT(*) as totalCount
+        from qzqm_check_info
+        where is_deleted=false and delivery_time between #{start} and #{end}
+        group by check_status;
+    </select>
+
+    <select id="countByQualifiedStatus" resultType="org.jeecg.modules.check.dto.CountDTO">
+        select qualified_status as type,COUNT(*) as totalCount
+        from qzqm_check_info
+        where is_deleted=false and delivery_time between #{start} and #{end}
+        group by qualified_status;
+    </select>
+
+    <select id="countPassRate" resultType="org.jeecg.modules.check.dto.PassRateDTO">
+        select t.product_draw productDraw,t.material_name materialName,concat(ROUND(IFNULL(q.total,0) * 100/t.total,2),'%')   rate
+        from (select product_draw,material_name,count(*) as total from qzqm_check_info where is_deleted=false group by product_draw) t
+        left join (select product_draw,count(*) as total from qzqm_check_info where is_deleted=false and qualified_status=1 group by product_draw) q
+        on t.product_draw=q.product_draw limit 10;
+    </select>
+
+    <select id="countFailure" resultType="java.lang.Long">
+        select COUNT(*)
+        from qzqm_check_info
+        where is_deleted =false and delivery_time between #{start} and #{end}
+        UNION ALL select IFNULL(count(*),0)
+        from qzqm_check_info
+        where is_deleted =false and qualified_status=2 and delivery_time between #{start} and #{end};
+    </select>
+
 </mapper>
