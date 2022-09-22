@@ -59,7 +59,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	private MesUserService mesUserService;
 	
 	/**
-	 * 分页列表查询
+	 * 已检列表
 	 *
 	 * @param qzqmCheckInfo
 	 * @param pageNo
@@ -67,13 +67,61 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	 * @param req
 	 * @return
 	 */
-	@AutoLog(value = "qzqm_check_info-分页列表查询")
-	@ApiOperation(value="qzqm_check_info-分页列表查询", notes="qzqm_check_info-分页列表查询")
+	@AutoLog(value = "qzqm_check_info-已检列表")
+	@ApiOperation(value="qzqm_check_info-已检列表", notes="qzqm_check_info-已检列表")
 	@GetMapping(value = "/list")
 	public Result<?> queryPageList(QzqmCheckInfo qzqmCheckInfo,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
+		//已检列表
+		qzqmCheckInfo.setCheckStatus(2);
+		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
+		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
+		return Result.OK(pageList);
+	}
+
+	/**
+	 * 送检列表
+	 *
+	 * @param qzqmCheckInfo
+	 * @param pageNo
+	 * @param pageSize
+	 * @param req
+	 * @return
+	 */
+	@AutoLog(value = "qzqm_check_info-送检列表")
+	@ApiOperation(value="qzqm_check_info-送检列表", notes="qzqm_check_info-送检列表")
+	@GetMapping(value = "/uncheckedList")
+	public Result<?> uncheckedList(QzqmCheckInfo qzqmCheckInfo,
+								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+								   HttpServletRequest req) {
+		qzqmCheckInfo.setCheckStatus(0);
+		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
+		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
+		return Result.OK(pageList);
+	}
+
+	/**
+	 * 在检列表
+	 *
+	 * @param qzqmCheckInfo
+	 * @param pageNo
+	 * @param pageSize
+	 * @param req
+	 * @return
+	 */
+	@AutoLog(value = "qzqm_check_info-在检列表")
+	@ApiOperation(value="qzqm_check_info-在检列表", notes="qzqm_check_info-在检列表")
+	@GetMapping(value = "/checkingList")
+	public Result<?> checkingList(QzqmCheckInfo qzqmCheckInfo,
+								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+								   HttpServletRequest req) {
+		qzqmCheckInfo.setCheckStatus(1);
 		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
 		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
 		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
@@ -104,6 +152,36 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@ApiOperation(value="qzqm_check_info-编辑", notes="qzqm_check_info-编辑")
 	@PutMapping(value = "/edit")
 	public Result<?> edit(@RequestBody QzqmCheckInfo qzqmCheckInfo) {
+		qzqmCheckInfoService.updateById(qzqmCheckInfo);
+		return Result.OK("编辑成功!");
+	}
+
+	/**
+	 *  checking
+	 *
+	 * @param qzqmCheckInfo
+	 * @return
+	 */
+	@AutoLog(value = "qzqm_check_info-checking")
+	@ApiOperation(value="qzqm_check_info-checking", notes="qzqm_check_info-checking")
+	@PutMapping(value = "/checking")
+	public Result<?> checking(@RequestBody QzqmCheckInfo qzqmCheckInfo) {
+		qzqmCheckInfo.setCheckStatus(1);
+		qzqmCheckInfoService.updateById(qzqmCheckInfo);
+		return Result.OK("编辑成功!");
+	}
+
+	/**
+	 *  checking
+	 *
+	 * @param qzqmCheckInfo
+	 * @return
+	 */
+	@AutoLog(value = "qzqm_check_info-checked")
+	@ApiOperation(value="qzqm_check_info-checking", notes="qzqm_check_info-checked")
+	@PutMapping(value = "/checked")
+	public Result<?> checked(@RequestBody QzqmCheckInfo qzqmCheckInfo) {
+		qzqmCheckInfo.setCheckStatus(2);
 		qzqmCheckInfoService.updateById(qzqmCheckInfo);
 		return Result.OK("编辑成功!");
 	}
