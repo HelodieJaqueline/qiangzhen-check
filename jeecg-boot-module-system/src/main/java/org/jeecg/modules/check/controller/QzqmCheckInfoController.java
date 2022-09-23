@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: qzqm_check_info
@@ -76,7 +77,13 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 								   HttpServletRequest req) {
 		//已检列表
 		qzqmCheckInfo.setCheckStatus(2);
-		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		Map<String, String[]> parameterMap = req.getParameterMap();
+		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, parameterMap);
+		String[] times = parameterMap.get("createTimeRange[]");
+		if (times != null && times.length == 2) {
+			queryWrapper.between("delivery_Time", times[0].replace("\"", ""),times[1].replace("\"", ""));
+		}
+		queryWrapper.orderByDesc("delivery_Time");
 		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
 		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
 		return Result.OK(pageList);
@@ -99,7 +106,13 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 		qzqmCheckInfo.setCheckStatus(0);
-		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		Map<String, String[]> parameterMap = req.getParameterMap();
+		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, parameterMap);
+		String[] times = parameterMap.get("createTimeRange[]");
+		if (times != null && times.length == 2) {
+			queryWrapper.between("delivery_Time", times[0].replace("\"", ""),times[1].replace("\"", ""));
+		}
+		queryWrapper.orderByDesc("delivery_Time");
 		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
 		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
 		return Result.OK(pageList);
@@ -122,7 +135,13 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 		qzqmCheckInfo.setCheckStatus(1);
-		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		Map<String, String[]> parameterMap = req.getParameterMap();
+		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, parameterMap);
+		String[] times = parameterMap.get("createTimeRange[]");
+		if (times != null && times.length == 2) {
+			queryWrapper.between("delivery_Time", times[0].replace("\"", ""),times[1].replace("\"", ""));
+		}
+		queryWrapper.orderByDesc("delivery_Time");
 		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
 		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
 		return Result.OK(pageList);
