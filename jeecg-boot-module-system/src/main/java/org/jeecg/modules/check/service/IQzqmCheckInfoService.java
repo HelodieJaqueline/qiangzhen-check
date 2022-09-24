@@ -16,9 +16,9 @@ import java.util.List;
  */
 public interface IQzqmCheckInfoService extends IService<QzqmCheckInfo> {
 
-    List<SummaryVO> summary(Integer type);
+    SummaryVO summary(Integer type);
 
     List<PassRateDTO> passRate();
 
-    List<FailureRateDTO> failureRate(Integer type, String productDraw);
+    FailureRateDTO failureRate(Integer type, String productDraw);
 }

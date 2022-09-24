@@ -323,20 +323,21 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@AutoLog(value = "qzqm_check_info-轮播表")
 	@ApiOperation(value="qzqm_check_info-轮播表", notes="qzqm_check_info-轮播表")
 	@GetMapping(value = "/tableScroll")
-	public List<QzqmCheckInfo> tableScroll(QzqmCheckInfo qzqmCheckInfo,
+	public Result<?> tableScroll(QzqmCheckInfo qzqmCheckInfo,
 								   @RequestParam(name="pageNo", defaultValue="1",required = false) Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10",required = false) Integer pageSize,
 								   HttpServletRequest req) {
 		QueryWrapper<QzqmCheckInfo> queryWrapper = QueryGenerator.initQueryWrapper(qzqmCheckInfo, req.getParameterMap());
+		queryWrapper.orderByDesc("delivery_Time");
 		Page<QzqmCheckInfo> page = new Page<QzqmCheckInfo>(pageNo, pageSize);
 		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
-		return pageList.getRecords();
+		return Result.OK(pageList);
 	}
 
 	@AutoLog(value = "qzqm_check_info-数据总览")
 	@ApiOperation(value = "qzqm_check_info-数据总览", notes = "qzqm_check_info-数据总览")
 	@GetMapping(value = "/summary")
-	public List<SummaryVO> summary(@RequestParam(required = false, defaultValue = "1") Integer type) {
+	public SummaryVO summary(@RequestParam(required = false, defaultValue = "1") Integer type) {
 		return qzqmCheckInfoService.summary(type);
 	}
 
@@ -350,7 +351,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@AutoLog(value = "qzqm_check_info-零件故障率")
 	@ApiOperation(value = "qzqm_check_info-零件故障率", notes = "qzqm_check_info-零件故障率")
 	@GetMapping(value = "/failureRate")
-	public List<FailureRateDTO> failureRate(@RequestParam(required = false, defaultValue = "1") Integer type,
+	public FailureRateDTO failureRate(@RequestParam(required = false, defaultValue = "1") Integer type,
 											String productDraw) {
 		return qzqmCheckInfoService.failureRate(type, productDraw);
 	}

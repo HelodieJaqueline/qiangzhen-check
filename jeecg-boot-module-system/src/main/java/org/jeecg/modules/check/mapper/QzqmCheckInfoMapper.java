@@ -23,5 +23,7 @@ public interface QzqmCheckInfoMapper extends BaseMapper<QzqmCheckInfo> {
 
     List<PassRateDTO> countPassRate();
 
-    List<Long> countFailure(@Param("start") Date start, @Param("end") Date end);
+    List<CountDTO> countByProductDraw(@Param("start") Date start, @Param("end") Date end,@Param("productDraw") String productDraw);
+
+    List<Long> totalCount(@Param("start") Date start, @Param("end") Date end,@Param("productDraw") String productDraw);
 }

@@ -31,10 +31,8 @@ import java.util.stream.Collectors;
 @Service
 public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, QzqmCheckInfo> implements IQzqmCheckInfoService {
 
-    private static final String BACKGROUND_COLOR = "#4992FF";
-
     @Override
-    public List<SummaryVO> summary(Integer type) {
+    public SummaryVO summary(Integer type) {
 
         //根据日期查询
         Date now = new Date();
@@ -54,26 +52,10 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
 
         List<CountDTO> checkStatusList = baseMapper.countByCheckStatus(start, end);
         if (CollectionUtils.isEmpty(checkStatusList)) {
-            // TODO:  
-            return null;
+            return SummaryVO.builder().total(0L).uncheck(0L).checking(0L).totalPassRate("0").build();
         }
         Map<Integer, Long> checkStatusMap = checkStatusList.stream()
                 .collect(Collectors.toMap(CountDTO::getType, CountDTO::getTotalCount));
-
-
-        List<CountDTO> qualifiedStatusList = baseMapper.countByQualifiedStatus(start, end);
-
-        Map<Integer, Long> qualifiedStatusMap = qualifiedStatusList.stream()
-                .collect(Collectors.toMap(CountDTO::getType, CountDTO::getTotalCount));
-
-        Long qualifiedCount = qualifiedStatusMap.getOrDefault(1, 0L);
-        Long totalQualifiedCount = 0L;
-        for (CountDTO countDTO : qualifiedStatusList) {
-            totalQualifiedCount += countDTO.getTotalCount();
-        }
-        BigDecimal qualifiedRate = BigDecimal.valueOf(qualifiedCount * 100)
-                .divide(BigDecimal.valueOf(totalQualifiedCount),new MathContext(2, RoundingMode.HALF_UP));
-
 
         //待检测数量
         Long unchecked = checkStatusMap.getOrDefault(0, 0L);
@@ -81,22 +63,25 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
         Long checking = checkStatusMap.getOrDefault(1, 0L);
         //已检数量
         Long checked = checkStatusMap.getOrDefault(2, 0L);
-        //总量
-        Long total = unchecked + checking + checked;
+        SummaryVO summaryVO = SummaryVO.builder().uncheck(unchecked).checking(checking).total(checked).build();
 
-        SummaryVO totalSummary = SummaryVO.builder()
-                .prefixText("总检测数量").value(String.valueOf(total)).backgroundColor(BACKGROUND_COLOR).build();
-        SummaryVO uncheckedSummary = SummaryVO.builder().prefixText("待检测数量").value(String.valueOf(unchecked)).backgroundColor(BACKGROUND_COLOR).build();
-        //总合格率
-        SummaryVO totalQualifiedSummary = SummaryVO.builder().prefixText("总合格率").value(qualifiedRate.toPlainString()).backgroundColor(BACKGROUND_COLOR).suffixText("%").build();
 
-        SummaryVO checkingSummary = SummaryVO.builder().prefixText("在检数量").backgroundColor(BACKGROUND_COLOR).value(String.valueOf(checking)).build();
-        List<SummaryVO> result = new LinkedList<>();
-        result.add(totalSummary);
-        result.add(uncheckedSummary);
-        result.add(totalQualifiedSummary);
-        result.add(checkingSummary);
-        return result;
+        List<CountDTO> qualifiedStatusList = baseMapper.countByQualifiedStatus(start, end);
+        if (CollectionUtils.isEmpty(qualifiedStatusList)) {
+            summaryVO.setTotalPassRate("0");
+            return summaryVO;
+        }
+        Map<Integer, Long> qualifiedStatusMap = qualifiedStatusList.stream()
+                .collect(Collectors.toMap(CountDTO::getType, CountDTO::getTotalCount));
+        Long qualifiedCount = qualifiedStatusMap.getOrDefault(1, 0L);
+        Long totalQualifiedCount = 0L;
+        for (CountDTO countDTO : qualifiedStatusList) {
+            totalQualifiedCount += countDTO.getTotalCount();
+        }
+        BigDecimal qualifiedRate = BigDecimal.valueOf(qualifiedCount * 100)
+                .divide(BigDecimal.valueOf(totalQualifiedCount),new MathContext(2, RoundingMode.HALF_UP));
+        summaryVO.setTotalPassRate(qualifiedRate.toPlainString());
+        return summaryVO;
     }
 
     @Override
@@ -105,7 +90,7 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
     }
 
     @Override
-    public List<FailureRateDTO> failureRate(Integer type, String productDraw) {
+    public FailureRateDTO failureRate(Integer type, String productDraw) {
         Date now = new Date();
         Date start, end;
         if (type.equals(1)) {
@@ -120,17 +105,20 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
         } else {
             return null;
         }
-        List<CountDTO> qualifiedStatusList = baseMapper.countByQualifiedStatus(start, end);
-        Map<Integer, Long> qualifiedMap = qualifiedStatusList.stream()
+        List<CountDTO> countDTOS = baseMapper.countByProductDraw(start, end, productDraw);
+        if (CollectionUtils.isEmpty(countDTOS)) {
+            return null;
+        }
+        Map<Integer, Long> qualifiedStatusMap = countDTOS.stream()
                 .collect(Collectors.toMap(CountDTO::getType, CountDTO::getTotalCount));
+        Long pass = qualifiedStatusMap.getOrDefault(1, 0L);
+        Long failure = qualifiedStatusMap.getOrDefault(2, 0L);
+        Long checked = pass + failure;
+        BigDecimal passRate = BigDecimal.valueOf(pass * 100)
+                .divide(BigDecimal.valueOf(checked), new MathContext(2, RoundingMode.HALF_UP));
 
-        Long unknown = qualifiedMap.getOrDefault(0,0L);
-        Long pass = qualifiedMap.getOrDefault(1,0L);
-        Long failure = qualifiedMap.getOrDefault(2,0L);
-        List<FailureRateDTO> result = new ArrayList<>(3);
-        result.add(FailureRateDTO.builder().name("未检测").value(unknown).build());
-        result.add(FailureRateDTO.builder().name("合格").value(pass).build());
-        result.add(FailureRateDTO.builder().name("不合格").value(failure).build());
-        return result;
+        return FailureRateDTO.builder().pass(pass).failure(failure)
+                .checked(checked).passRate(passRate.toPlainString()).build();
+
     }
 }
