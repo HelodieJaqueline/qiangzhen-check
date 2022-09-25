@@ -86,7 +86,13 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
 
     @Override
     public List<PassRateDTO> passRate() {
-        return baseMapper.countPassRate();
+        List<PassRateDTO> list = baseMapper.countPassRate();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (PassRateDTO passRateDTO : list) {
+                passRateDTO.setRate(passRateDTO.getRate() + "%");
+            }
+        }
+        return list;
     }
 
     @Override
