@@ -362,7 +362,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@ApiOperation(value="qzqm_check_info-getCookie", notes="qzqm_check_info-getCookie")
 	@GetMapping(value = "/getCookie")
 	public Result<?> getCookie(String userId) {
-		return Result.OK(mesUserService.getCookie());
+		return Result.OK(mesUserService.getUserCookie());
 	}
 
 }
