@@ -9,7 +9,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.jeecg.modules.check.dto.MesUserInfoResponse;
 import org.springframework.stereotype.Service;
 
+import java.net.HttpCookie;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +33,7 @@ public class MesUserService {
                 .form(params)
                 .header("Cookie", getUserCookie())
                 .execute();
+        log.info("getUserInfoByCode from MES response:{}", response);
         MesUserInfoResponse mesUserInfoResponse = JSON.parseObject(response.body(), MesUserInfoResponse.class);
         if (null != mesUserInfoResponse && CollectionUtils.isNotEmpty(mesUserInfoResponse.getMesUsers())) {
             return mesUserInfoResponse.getMesUsers().get(0);
@@ -39,7 +42,7 @@ public class MesUserService {
     }
 
     public String getUserCookie() {
-        return ".AspNetCore.Cookies=CfDJ8FAok77Wx-VAgWHfwSImD2RkDSL-j6uA5Cr9fiXCddp6ELTHaZ-yUNfcqRLFpHzMO5TdzwwPPcUjci_Ag09L7xIog9dpu2k23milhb2jWwtNfprXEbo0O-tqAMjZOt2ZG8io6caFDUTK2YqcYi9rZ_OFkJ4PR-zGFJncrcUpj6SAuOOuTc1A4oRjGM-f4RiBjn0StHB9u4it1Is4Oxm2h0qOHGlvyS5gvQl33UYOy6HomMMq7iY3W24hDFNXkzqa0rII910sr-UsPgZAIQz6IhAZHGVhNKYbtyps06cfG6DYLxugeOWMVQUPSrLmifqKi2KJywBFChxbngsTaf2kgR7-baIkOgrRNx60n-_1or0rN93BDPfaBJADrhvKNczAniHflWUqfaaniI_x0Klu-o1CyaVNnkM2zC289B4mNoixX_O-DZLF8hPjl9H7lgqSSav48VYFFCdvYAPvowTzIOU";
+        return ".AspNetCore.Cookies=CfDJ8FAok77Wx-VAgWHfwSImD2QY8h-d1RCYIfK8xJsv5UaE_ihDyvxOaVyW5ZkR2yvxmL646lz0s-9mUksYdQEqx8oejvwli5brA3VUdvWLHBlV0MtR5xNEzL6XiAthdhtFLkts9sq3uKC79NZYp21mlpe58p9ZpOvoRwHTFcQ_pf-eDVip9wK30oXPzCKvcF2gnt7S7K2m3GSIFGsmRQYYF5kyCXXg71hwGCsjEAc9v1A5VSg9yLWJBKhINerLTM0JtYwMU-yLbfsOYPGOZMGaTuVdJtZeIJAYXkxRsOtV4OvQhWB-2-7IoLN4oEnTOupM5W66A5zjneEEmMXYv9qzXx0Leck7UeNgLjckc54rtOQdzQcW5cp-wWA7uPI6VqIbAV-WdqcOMUgdg4jvejW6nJQDXDksN5YPsVdHfHsrtDLwsVle5CPqFCpLMdeOXowIvyDktQqWUl7QEWZ6ulUGajA";
 /*        Map<String, Object> param = new HashMap<>();
         param.put("username", "admin");
         param.put("password", "maple");
@@ -47,6 +50,21 @@ public class MesUserService {
                 .contentType(ContentType.FORM_URLENCODED.getValue())
                 .form(param).execute();
         return response == null ? null : response.getCookieStr();*/
+    }
+
+    public Map<String, Object> getCookie() {
+        Map<String, Object> param = new HashMap<>();
+        param.put("strUserCode", "admin");
+        param.put("strPassword", "maple");
+        HttpResponse response = HttpRequest.post("http://qzqms.check.com/Account/MESCheckLogin")
+                .contentType(ContentType.FORM_URLENCODED.getValue())
+                .form(param).execute();
+        String cookieStr = response.getCookieStr();
+        List<HttpCookie> cookies = response.getCookies();
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("cookieStr", cookieStr);
+        result.put("cookies", cookies);
+        return result;
     }
 
 }

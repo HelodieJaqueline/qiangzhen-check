@@ -7,6 +7,8 @@ import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.check.dto.MesWorkStateResponse;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,7 @@ import java.util.List;
 public class MesWorkService {
 
 
-    public MesWorkStateResponse.WorkState queryInfo(String workCode) {
+    public Result<?> queryInfo(String workCode) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.minusDays(180);
         LocalDateTime endOfToday = DateUtil.toLocalDateTime(DateUtil.endOfDay(new Date()));
@@ -41,7 +43,32 @@ public class MesWorkService {
         log.info("接口返回:{}", body);
         MesWorkStateResponse mesWorkStateResponse = JSON.parseObject(body, MesWorkStateResponse.class);
         List<MesWorkStateResponse.WorkState> workStates = mesWorkStateResponse.getWorkStates();
-        return CollectionUtils.isEmpty(workStates) ? null : workStates.get(0);
+        if (CollectionUtils.isEmpty(workStates)) {
+            return Result.error("未查询到流程卡号对应的工单西信息");
+        }
+        MesWorkStateResponse.WorkState workState = workStates.get(0);
+        if (StringUtils.isBlank(workState.getWorkCode())) {
+            return Result.error("未查询到流程卡号信息");
+        }
+        if (StringUtils.isBlank(workState.getMaterialCode())) {
+            return Result.error("未查询到物料号信息");
+        }
+        if (StringUtils.isBlank(workState.getMaterialName())) {
+            return Result.error("未查询到物料名称信息");
+        }
+        if (StringUtils.isBlank(workState.getProductDraw())) {
+            return Result.error("未查询到图号信息");
+        }
+        if (StringUtils.isBlank(workState.getDesc2())) {
+            return Result.error("未查询到硬度信息");
+        }
+        if (StringUtils.isBlank(workState.getDesc3())) {
+            return Result.error("未查询到材质信息");
+        }
+        if (StringUtils.isBlank(workState.getPStationName())) {
+            return Result.error("未查询到材质信息");
+        }
+        return Result.OK(workState);
     }
 
     public MesWorkStateResponse.WorkState queryInfo(){

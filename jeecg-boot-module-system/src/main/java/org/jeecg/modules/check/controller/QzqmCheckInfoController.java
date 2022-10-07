@@ -58,7 +58,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 
 	@Autowired
 	private MesUserService mesUserService;
-	
+
 	/**
 	 * 已检列表
 	 *
@@ -146,7 +146,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		IPage<QzqmCheckInfo> pageList = qzqmCheckInfoService.page(page, queryWrapper);
 		return Result.OK(pageList);
 	}
-	
+
 	/**
 	 *   添加
 	 *
@@ -160,7 +160,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		qzqmCheckInfoService.save(qzqmCheckInfo);
 		return Result.OK("添加成功！");
 	}
-	
+
 	/**
 	 *  编辑
 	 *
@@ -204,7 +204,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		qzqmCheckInfoService.updateById(qzqmCheckInfo);
 		return Result.OK("编辑成功!");
 	}
-	
+
 	/**
 	 *   通过id删除
 	 *
@@ -218,7 +218,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		qzqmCheckInfoService.removeById(id);
 		return Result.OK("删除成功!");
 	}
-	
+
 	/**
 	 *  批量删除
 	 *
@@ -232,7 +232,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		this.qzqmCheckInfoService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.OK("批量删除成功!");
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *
@@ -285,8 +285,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	 @GetMapping(value = "/queryWorkState")
 	 public Result<?> queryWorkState(QzqmCheckInfo qzqmCheckInfo,
 									HttpServletRequest req) {
-		 MesWorkStateResponse.WorkState workState = mesWorkService.queryInfo(qzqmCheckInfo.getWorkCode());
-		 return Result.OK(workState);
+		 return mesWorkService.queryInfo(qzqmCheckInfo.getWorkCode());
 	 }
 
 	 /**
@@ -301,7 +300,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 		 List<QzqmCheckInfo> list = qzqmCheckInfoService.list(new LambdaQueryWrapper<QzqmCheckInfo>().eq(QzqmCheckInfo::getWorkCode, workCode)
 				 .eq(QzqmCheckInfo::getIsDeleted, false));
 		 if(CollectionUtils.isEmpty(list)) {
-			 return Result.error("未找到对应数据");
+			 return Result.error("未找到流程卡号" + workCode + "对应的工单数据");
 		 }
 		 return Result.OK(list.get(0));
 	 }
@@ -317,6 +316,9 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@GetMapping(value = "/queryMesUser")
 	public Result<?> queryMesUser(String userId) {
 		MesUserInfoResponse.MesUser mesUser = mesUserService.getUserInfoByCode(userId);
+		if (null == mesUser) {
+			return Result.error("未找到" + userId + "对应的员工信息");
+		}
 		return Result.OK(mesUser);
 	}
 
@@ -354,6 +356,13 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	public FailureRateDTO failureRate(@RequestParam(required = false, defaultValue = "1") Integer type,
 											String productDraw) {
 		return qzqmCheckInfoService.failureRate(type, productDraw);
+	}
+
+	@AutoLog(value = "qzqm_check_info-getCookie")
+	@ApiOperation(value="qzqm_check_info-getCookie", notes="qzqm_check_info-getCookie")
+	@GetMapping(value = "/getCookie")
+	public Result<?> getCookie(String userId) {
+		return Result.OK(mesUserService.getCookie());
 	}
 
 }
