@@ -67,6 +67,10 @@ public class QzqmCheckInfo implements Serializable {
 	@Excel(name = "当前工序", width = 15)
     @ApiModelProperty(value = "当前工序")
     private String process;
+    /**当前工序*/
+    @Excel(name = "当前工序详情", width = 15)
+    @ApiModelProperty(value = "当前工序详情")
+    private String processDetail;
 	/**材质*/
 	@Excel(name = "材质", width = 15)
     @ApiModelProperty(value = "材质")
