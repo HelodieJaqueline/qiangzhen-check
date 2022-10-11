@@ -3,6 +3,7 @@ package org.jeecg.modules.check.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.check.dto.CountDTO;
 import org.jeecg.modules.check.dto.FailureRateDTO;
 import org.jeecg.modules.check.dto.PassRateDTO;
@@ -10,11 +11,15 @@ import org.jeecg.modules.check.entity.QzqmCheckInfo;
 import org.jeecg.modules.check.mapper.QzqmCheckInfoMapper;
 import org.jeecg.modules.check.service.IQzqmCheckInfoService;
 import org.jeecg.modules.check.vo.SummaryVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -30,6 +35,20 @@ import java.util.stream.Collectors;
  */
 @Service
 public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, QzqmCheckInfo> implements IQzqmCheckInfoService {
+
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
+
+    @Override
+    public boolean save(QzqmCheckInfo entity) {
+        //时间做前缀
+        LocalDate today = LocalDate.now();
+        String todayStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        //编号递增
+        Long number = redisTemplate.opsForValue().increment(todayStr);
+        entity.setCheckNo(Long.valueOf(todayStr + number));
+        return super.save(entity);
+    }
 
     @Override
     public SummaryVO summary(Integer type) {

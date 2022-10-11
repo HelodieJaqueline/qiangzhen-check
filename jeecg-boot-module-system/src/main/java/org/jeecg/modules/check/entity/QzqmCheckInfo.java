@@ -39,6 +39,11 @@ public class QzqmCheckInfo implements Serializable {
 	@Excel(name = "流程卡号", width = 15)
     @ApiModelProperty(value = "流程卡号")
     private String workCode;
+
+    /**检测编号*/
+    @Excel(name = "检测编号", width = 20)
+    @ApiModelProperty(value = "检测编号")
+    private Long checkNo;
 	/**物料号*/
 	@Excel(name = "物料号", width = 15)
     @ApiModelProperty(value = "物料号")
