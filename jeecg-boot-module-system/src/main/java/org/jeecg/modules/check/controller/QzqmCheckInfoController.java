@@ -36,6 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -191,7 +192,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	}
 
 	/**
-	 *  checking
+	 *  checked
 	 *
 	 * @param qzqmCheckInfo
 	 * @return
@@ -201,6 +202,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@PutMapping(value = "/checked")
 	public Result<?> checked(@RequestBody QzqmCheckInfo qzqmCheckInfo) {
 		qzqmCheckInfo.setCheckStatus(2);
+		qzqmCheckInfo.setFinishedTime(new Date());
 		qzqmCheckInfoService.updateById(qzqmCheckInfo);
 		return Result.OK("编辑成功!");
 	}

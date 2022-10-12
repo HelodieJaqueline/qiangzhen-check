@@ -47,6 +47,7 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
         //编号递增
         Long number = redisTemplate.opsForValue().increment(todayStr);
         entity.setCheckNo(Long.valueOf(todayStr + number));
+        entity.setDeliveryTime(new Date());
         return super.save(entity);
     }
 
