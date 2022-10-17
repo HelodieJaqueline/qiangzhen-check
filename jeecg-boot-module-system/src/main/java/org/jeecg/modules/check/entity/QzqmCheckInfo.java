@@ -125,6 +125,10 @@ public class QzqmCheckInfo implements Serializable {
 	@Excel(name = "上传报告地址", width = 15)
     @ApiModelProperty(value = "上传报告地址")
     private String reportUrl;
+    /**上传pdf报告地址*/
+    @Excel(name = "上传pdf报告地址", width = 15)
+    @ApiModelProperty(value = "上传pdf报告地址")
+    private String reportPdfUrl;
 	/**结束日期*/
 	@Excel(name = "结束日期", width = 15, format = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
