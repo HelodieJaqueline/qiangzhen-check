@@ -45,7 +45,7 @@ public class MesUserService {
         Map<String, Object> param = new HashMap<>();
         param.put("strUserCode", "admin");
         param.put("strPassword", "maple");
-        HttpResponse response = HttpRequest.post("http://qzqms.check.com/Account/MESCheckLogin")
+        HttpResponse response = HttpRequest.post("http://172.16.10.2:5000/Account/MESCheckLogin")
                 .contentType(ContentType.FORM_URLENCODED.getValue())
                 .form(param).execute();
         log.info("MESCheckLogin return Cookie:{}",response.getCookieStr());
