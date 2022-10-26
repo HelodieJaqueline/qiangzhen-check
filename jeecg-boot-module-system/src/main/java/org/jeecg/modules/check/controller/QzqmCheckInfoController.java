@@ -1,5 +1,7 @@
 package org.jeecg.modules.check.controller;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.math.MathUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -8,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.math3.util.MathUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.base.controller.JeecgController;
@@ -35,6 +38,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -187,6 +191,7 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@PutMapping(value = "/checking")
 	public Result<?> checking(@RequestBody QzqmCheckInfo qzqmCheckInfo) {
 		qzqmCheckInfo.setCheckStatus(1);
+		qzqmCheckInfo.setCheckTime(new Date());
 		qzqmCheckInfoService.updateById(qzqmCheckInfo);
 		return Result.OK("编辑成功!");
 	}
@@ -202,7 +207,12 @@ public class QzqmCheckInfoController extends JeecgController<QzqmCheckInfo, IQzq
 	@PutMapping(value = "/checked")
 	public Result<?> checked(@RequestBody QzqmCheckInfo qzqmCheckInfo) {
 		qzqmCheckInfo.setCheckStatus(2);
-		qzqmCheckInfo.setFinishedTime(new Date());
+		Date fishedTime = new Date();
+		qzqmCheckInfo.setFinishedTime(fishedTime);
+		long difference = fishedTime.getTime() - qzqmCheckInfo.getDeliveryTime().getTime();
+		Double ceil = Math.ceil(difference / (1000.00 * 60 * 60));
+		int intValue = ceil.intValue();
+		qzqmCheckInfo.setEvaluateTime(intValue);
 		qzqmCheckInfoService.updateById(qzqmCheckInfo);
 		return Result.OK("编辑成功!");
 	}
