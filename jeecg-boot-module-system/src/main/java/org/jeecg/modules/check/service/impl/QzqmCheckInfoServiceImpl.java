@@ -137,9 +137,10 @@ public class QzqmCheckInfoServiceImpl extends ServiceImpl<QzqmCheckInfoMapper, Q
         }
         Map<Integer, Long> qualifiedStatusMap = countDTOS.stream()
                 .collect(Collectors.toMap(CountDTO::getType, CountDTO::getTotalCount));
+        Long unknow = qualifiedStatusMap.getOrDefault(0, 0L);
         Long pass = qualifiedStatusMap.getOrDefault(1, 0L);
         Long failure = qualifiedStatusMap.getOrDefault(2, 0L);
-        Long checked = pass + failure;
+        Long checked = unknow + pass + failure;
         BigDecimal passRate = BigDecimal.valueOf(pass * 100)
                 .divide(BigDecimal.valueOf(checked), new MathContext(2, RoundingMode.HALF_UP));
 
